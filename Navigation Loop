@@ -1,0 +1,22 @@
+while ((track_x[length(track_x)] - platform_x)^2 + (track_y[length(track_y)] - platform_y)^2 > platform_radius^2) # while out of platform
+  {
+    
+    #if (count%%3 == 0) {#possible to change model every three loops # c
+    randmodel = sample(c(1,-1), 1, prob = c(0.95,0.05)) # choose from the two models randomly, with prob 0.02 of switching model
+    curr_model = randmodel*curr_model # model will be changed if randmodel = -1
+    #}
+    
+    weights_dc <- weights_dc*(1-noise) + matrix(runif(N_dc*N_ac), nrow = N_dc)*Wmult*noise # c
+    weights_pc <- weights_pc*(1-noise) + matrix(runif(N_pc*N_ac), nrow = N_pc)*Wmult*noise # c
+    
+    dist.to.wall <- pool_diameter/2 - sqrt(track_x[length(track_x)]^2+track_y[length(track_y)]^2)
+    
+    #Calculate DC and PC activation
+    DC_activation <- rep(0, N_dc)
+    for (i in 1:N_dc){
+      DC_activation[i] <- exp(-(dist.to.wall -DC[i])^2/(2*sigma_dc^2))
+    }
+    PC_activation <- rep(0, N_pc) # c
+    for (i in 1:N_pc){# c
+      PC_activation[i] <- exp(-((track_x[length(track_x)] - PC_x[i])^2 + (track_y[length(track_y)] - PC_y[i])^2)/(2*sigma_pc^2))
+    }# c
